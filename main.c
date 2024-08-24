@@ -32,16 +32,29 @@ void test_write_sheet()
 {
     init_stl(&s);
 
-    int R=60;
-    int C=60;
-    vec_t over[60*60];
-    vec_t under[60*60];
-    for (int r=0; r!=60; ++r) {
-        for (int c=0; c!=60; ++c) {
-            float rr = 0.1*r;
-            float cc = 0.1*c;
-            over[r*C+c]  = (vec_t){rr, cc, 1.1 + sin(rr+2*cc)};
-            under[r*C+c] = (vec_t){rr, cc, 1.0 + sin(rr+2*cc)};
+    #define RR 60
+    #define CC 60
+
+    int R=RR;
+    int C=CC;
+    vec_t over[RR*CC];
+    vec_t under[RR*CC];
+    float eps=0.3;
+
+    for (int r=0; r!=R; ++r) {
+        for (int c=0; c!=C; ++c) {
+            //float ss = 1.;
+            float ss =
+                (r==0 || r==R-1  || c==0 || c==C-1  ) ? sqrt(1-(.99)*(.99)) :
+                (r==1 || r==R-1-1|| c==1 || c==C-1-1) ? sqrt(1-(.79)*(.79)) :
+                (r==2 || r==R-1-2|| c==2 || c==C-1-2) ? sqrt(1-(.59)*(.59)) :
+                (r==2 || r==R-1-3|| c==3 || c==C-1-3) ? sqrt(1-(.39)*(.39)) :
+                (r==2 || r==R-1-4|| c==4 || c==C-1-4) ? sqrt(1-(.19)*(.19)) : 1.0;
+
+            float rr = 1.0*(r-R/2);
+            float cc = 1.0*(c-C/2);
+            over[r*C+c]  = (vec_t){rr, cc, 1+ss*eps + 1.0*sin(0.01*(1+rr)*rr+0.20*cc) +10./(1. + 0.01*rr*rr+0.01*cc*cc)};
+            under[r*C+c] = (vec_t){rr, cc, 1-ss*eps + 1.0*sin(0.01*(1+rr)*rr+0.20*cc) +10./(1. + 0.01*rr*rr+0.01*cc*cc)};
         }
     }
 
