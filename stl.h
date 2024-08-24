@@ -9,7 +9,7 @@
 
 
 
-#define MAX_TRIS 1000
+#define MAX_TRIS 100000
 
 
 
@@ -29,7 +29,12 @@ typedef struct {
 
 
 
+void init_stl(stl_t* s);
+
+void add_tri(stl_t* s, tri_t t);
+
 void write_stl_to(FILE* fp, stl_t s, char const* model_name);
+
 
 
 

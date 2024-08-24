@@ -10,6 +10,21 @@
 
 
 
+void init_stl(stl_t* s)
+{
+    s->nb_tris = 0;
+}
+
+
+
+void add_tri(stl_t* s, tri_t t)
+{
+    s->tri[s->nb_tris] = t;
+    s->nb_tris += 1;
+}
+
+
+
 void write_stl_to(FILE* fp, stl_t s, char const* model_name)
 {
     char buff[STL_HEADER_SIZE];
@@ -29,9 +44,9 @@ void write_stl_to(FILE* fp, stl_t s, char const* model_name)
     vec_t dummy_normal = (vec_t){0,0,0};
     for (int t=0; t!=s.nb_tris; t++) {
         fwrite(&dummy_normal, sizeof(vec_t), 1, fp);
-        fwrite(&(s.tri[t].a), sizeof(vec_t), 1, fp);
-        fwrite(&(s.tri[t].b), sizeof(vec_t), 1, fp);
-        fwrite(&(s.tri[t].c), sizeof(vec_t), 1, fp);
+        fwrite(&(s.tri[t].a), sizeof(vec_t), 1, fp); // note: can do all at once
+        fwrite(&(s.tri[t].b), sizeof(vec_t), 1, fp); //
+        fwrite(&(s.tri[t].c), sizeof(vec_t), 1, fp); //
         for (int i=0; i!=STL_SPACER_SIZE; ++i) { fputc(0, fp); }
     }
 }
