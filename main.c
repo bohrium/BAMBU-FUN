@@ -5,16 +5,97 @@
 
 
 
+stl_t s;
+
 void test_write_stl();
+
 void test_write_torus(int maj_res, int min_res, float maj_rad, float min_rad);
+
+void test_write_tube(int maj_res, int min_res, float maj_rad, float min_rad);
 
 
 
 int main(int argc, char** argv)
 {
     //test_write_stl();
-    test_write_torus(60, 60, 5., 2.);
+    //test_write_torus(60, 60, 5., 2.);
+    test_write_tube(150, 90, 5., 2.);
     return 0;
+}
+
+
+
+void test_write_tube(int maj_res, int min_res, float maj_rad, float min_rad)
+{
+    init_stl(&s);
+
+    int nb_centers = maj_res;
+    vec_t* centers = malloc(sizeof(vec_t)*nb_centers);
+
+    float* coeffs_normal = malloc(sizeof(float)*min_res);
+    float* coeffs_binorm = malloc(sizeof(float)*min_res);
+    make_fourier(coeffs_normal, min_res, (const float[3][2]){{+2. , 0. },{+1.0, 0. },{-0.2, 0. }}, 3);
+    make_fourier(coeffs_binorm, min_res, (const float[3][2]){{ 0. ,+2. },{ 0. , 0. },{ 0. , 0. }}, 3);
+
+    float* centers_transpose[3];
+    centers_transpose[0] = malloc(sizeof(float)*nb_centers);
+    centers_transpose[1] = malloc(sizeof(float)*nb_centers);
+    centers_transpose[2] = malloc(sizeof(float)*nb_centers);
+    make_fourier(centers_transpose[0], nb_centers,
+        (const float[5][2]){
+            {+5.000, 0.   },
+            { 0.000, 0.   },
+            { 0.025, 0.   },
+            {-0.025, 0.   },
+            {+0.025, 0.   },
+        },
+        5
+    );
+    make_fourier(centers_transpose[1], nb_centers,
+        (const float[5][2]){
+            { 0.   ,+5.000},
+            { 0.150, 0.   },
+            { 0.075, 0.   },
+            { 0.   , 0.   },
+            {+0.025, 0.   },
+        },
+        5
+    );
+    make_fourier(centers_transpose[2], nb_centers,
+        (const float[5][2]){
+            { 0.   , 0.   },
+            { 0.   ,+0.025},
+            { 0.   ,+0.025},
+            { 0.   ,+0.025},
+            { 0.   ,+0.125},
+        },
+        5
+    );
+    for (int r=0; r!=nb_centers; ++r) {
+        centers[r] = (vec_t){
+            centers_transpose[0][r],
+            centers_transpose[1][r],
+            centers_transpose[2][r],
+        };
+    }
+    free(centers_transpose[0]);
+    free(centers_transpose[1]);
+    free(centers_transpose[2]);
+
+
+    add_tube(
+        &s,
+        centers, nb_centers,
+        min_res,
+        coeffs_normal,
+        coeffs_binorm
+    );
+
+    free(centers);
+
+    FILE* fp = fopen("tube.stl", "wb");
+    write_stl_to(fp, s, "mooloop");
+    fclose(fp);
 }
 
 
@@ -30,7 +111,6 @@ vec_t vert_from(float rr, float cc, float maj_rad, float min_rad)
 
 void test_write_torus(int maj_res, int min_res, float maj_rad, float min_rad)
 {
-    stl_t s;
     init_stl(&s);
 
     for (int r=0; r!=maj_res; ++r) {
@@ -41,10 +121,6 @@ void test_write_torus(int maj_res, int min_res, float maj_rad, float min_rad)
             vec_t v11 = vert_from(((float)r+1.)/maj_res, ((float)c+1.)/min_res, maj_rad, min_rad);
             add_tri(&s, (tri_t){v00,v01,v10});
             add_tri(&s, (tri_t){v01,v10,v11});
-            //s.tri[s.nb_tris] = (tri_t){v00,v01,v10};
-            //s.nb_tris += 1;
-            //s.tri[s.nb_tris] = (tri_t){v01,v10,v11};
-            //s.nb_tris += 1;
         }
     }
 
@@ -58,7 +134,6 @@ void test_write_torus(int maj_res, int min_res, float maj_rad, float min_rad)
 
 void test_write_stl()
 {
-    stl_t s;
     s.nb_tris = 4;
     s.tri[0] = (tri_t){{2,1,1},{1,2,1},{1,1,2}};
     s.tri[1] = (tri_t){{3,3,3},{1,2,1},{1,1,2}};
