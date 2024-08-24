@@ -13,14 +13,43 @@ void test_write_torus(int maj_res, int min_res, float maj_rad, float min_rad);
 
 void test_write_tube(int maj_res, int min_res, float maj_rad, float min_rad);
 
+void test_write_sheet();
+
 
 
 int main(int argc, char** argv)
 {
     //test_write_stl();
     //test_write_torus(60, 60, 5., 2.);
-    test_write_tube(150, 90, 5., 2.);
+    //test_write_tube(150, 90, 5., 2.);
+    test_write_sheet();
     return 0;
+}
+
+
+
+void test_write_sheet()
+{
+    init_stl(&s);
+
+    int R=60;
+    int C=60;
+    vec_t over[60*60];
+    vec_t under[60*60];
+    for (int r=0; r!=60; ++r) {
+        for (int c=0; c!=60; ++c) {
+            float rr = 0.1*r;
+            float cc = 0.1*c;
+            over[r*C+c]  = (vec_t){rr, cc, 1.1 + sin(rr+2*cc)};
+            under[r*C+c] = (vec_t){rr, cc, 1.0 + sin(rr+2*cc)};
+        }
+    }
+
+    add_sheet(&s, R, C, over, under);
+
+    FILE* fp = fopen("sheet.stl", "wb");
+    write_stl_to(fp, s, "moosheet");
+    fclose(fp);
 }
 
 

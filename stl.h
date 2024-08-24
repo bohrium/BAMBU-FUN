@@ -44,6 +44,11 @@ void add_tube(
     float_t const* coeffs_binorm
 );
 
+void add_sheet(stl_t* s, int R, int C,
+        vec_t const* over,
+        vec_t const* under
+        );
+
 void write_stl_to(FILE* fp, stl_t s, char const* model_name);
 
 

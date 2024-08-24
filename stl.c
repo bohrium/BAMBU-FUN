@@ -169,3 +169,62 @@ void write_stl_to(FILE* fp, stl_t s, char const* model_name)
 }
 
 
+void add_sheet(stl_t* s, int R, int C,
+        vec_t const* over,
+        vec_t const* under
+        )
+{
+    vec_t v00,v01,v10,v11;
+
+    for (int r=0; r!=R-1; ++r) {
+        for (int c=0; c!=C-1; ++c) {
+            v00 = over[(r+0)*C+(c+0)];
+            v01 = over[(r+0)*C+(c+1)];
+            v10 = over[(r+1)*C+(c+0)];
+            v11 = over[(r+1)*C+(c+1)];
+            add_tri(s, (tri_t){v00,v01,v10});
+            add_tri(s, (tri_t){v01,v10,v11});
+
+            v00 = under[(r+0)*C+(c+0)];
+            v01 = under[(r+0)*C+(c+1)];
+            v10 = under[(r+1)*C+(c+0)];
+            v11 = under[(r+1)*C+(c+1)];
+            add_tri(s, (tri_t){v00,v01,v10});
+            add_tri(s, (tri_t){v01,v10,v11});
+        }
+    }
+
+    for (int r=0; r!=R-1; ++r) {
+        v00 = over[(r+0)*C+0];
+        v01 =under[(r+0)*C+0];
+        v10 = over[(r+1)*C+0];
+        v11 =under[(r+1)*C+0];
+        add_tri(s, (tri_t){v00,v01,v10});
+        add_tri(s, (tri_t){v01,v10,v11});
+
+        v00 = over[(r+0)*C+C-1];
+        v01 =under[(r+0)*C+C-1];
+        v10 = over[(r+1)*C+C-1];
+        v11 =under[(r+1)*C+C-1];
+        add_tri(s, (tri_t){v00,v01,v10});
+        add_tri(s, (tri_t){v01,v10,v11});
+    }
+
+    for (int c=0; c!=C-1; ++c) {
+        v00 = over[0*C+(c+0)];
+        v01 = over[0*C+(c+1)];
+        v10 =under[0*C+(c+0)];
+        v11 =under[0*C+(c+1)];
+        add_tri(s, (tri_t){v00,v01,v10});
+        add_tri(s, (tri_t){v01,v10,v11});
+
+        v00 = over[(R-1)*C+(c+0)];
+        v01 = over[(R-1)*C+(c+1)];
+        v10 =under[(R-1)*C+(c+0)];
+        v11 =under[(R-1)*C+(c+1)];
+        add_tri(s, (tri_t){v00,v01,v10});
+        add_tri(s, (tri_t){v01,v10,v11});
+    }
+}
+
+
