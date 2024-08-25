@@ -9,7 +9,7 @@
 
 
 
-#define MAX_TRIS 100000
+#define MAX_TRIS 1000000
 
 
 
@@ -49,7 +49,7 @@ void add_sheet(stl_t* s, int R, int C,
         vec_t const* under
         );
 
-void write_stl_to(FILE* fp, stl_t s, char const* model_name);
+void write_stl_to(FILE* fp, stl_t const* s, char const* model_name);
 
 
 
